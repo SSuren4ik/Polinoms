@@ -19,14 +19,13 @@ int main()
     Monom m5(-8.0, 5, 0, 5);
     p1.Add(m1);
     p1.Add(m2);
-    p2.Add(m4);
+    p2.Add(m4); 
+    p3 = p1 - p2;
+    p4 = p1 * p3;
     out << p1 << endl;
     out << p2 << endl;
-    p3 = p1 - p2;
     out << p3 << endl;
-    p4 = p1 * p3;
     out << p4 << endl;
-    out.close();
     in >> p1;
     in >> p2;
     in >> p3;

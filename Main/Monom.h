@@ -14,11 +14,12 @@ public:
     Monom(double _a = 0, int pow1 = 0, int pow2 = 0, int pow3 = 0)
     {
         s = (pow1 + offset) + (pow2 + offset) * numbsystem + (pow3 + offset) * numbsystem * numbsystem;
-        if (!StepCheck())
+        if (pow1 > Max_Pow || pow1 <-Max_Pow || pow2 > Max_Pow || pow2 < -Max_Pow|| pow3 > Max_Pow || pow3 < -Max_Pow)
         {
             throw exception();
         }
-        a = _a;
+        a = _a;      
+        s = (pow1 + offset) + (pow2 + offset) * numbsystem + (pow3 + offset) * numbsystem * numbsystem;
     }
     Monom(int _s, double _a)
     {
@@ -360,5 +361,12 @@ public:
         int _s = (x + offset) + (y + 10) * numbsystem + (z + 10) * numbsystem * numbsystem;
         return *new Monom(_s, _a);
     }
-
+    bool operator ==(Monom& m2)
+    {
+        if (a != m2.a)
+            return false;
+        if(s !=m2.s)
+            return false;
+        return true;    
+    }
 };
