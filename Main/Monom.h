@@ -332,7 +332,7 @@ public:
 
     void Change_Kof(double _a)
     {
-        a += _a;
+        a =_a;
     }
     bool Equal_Steps(const Monom& _m)
     {

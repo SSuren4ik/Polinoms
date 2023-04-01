@@ -76,11 +76,11 @@ public:
         while (!isEmpty())
             del_first();
     }
-    void Add_last(const Monom& m)
+    void Add_last (Monom& m)
     {
         if (m.a == 0)
             return;
-        if (m.s < 0 || m.s > 9260)
+        if (!m.StepCheck())
         {
             return;
         }
@@ -97,7 +97,7 @@ public:
             return;
         }
         Link* tmp = new Link(m, start);
-        tmp->m.Change_Kof(-2 * m.a);
+        tmp->m.Change_Kof(-m.a);
         end->next = tmp;
         end = tmp;
     }
@@ -110,36 +110,46 @@ public:
             return;
         }
         Link* tmp = new Link(m, start);
-        tmp->m.Change_Kof(-2 * m.a);
+        tmp->m.Change_Kof(-m.a);
         Add(tmp->m);
     }
-    void Add(const Monom& m)
+    void Add(const Monom& monom)
     {
-        if (m.a == 0)
+        if (monom.a == 0)
             return;
-        if (m.s < 0 || m.s > 9260)
+        if (monom.s < 0 || monom.s > 9260)
         {
             return;
         }
-        Link* t = start->next;
-        Link* tmp = new Link(m, start);
+        Link* t = start;
+        Link* tmp = new Link(monom);
         while (t->next != start)
         {
-            if (t->next->m.Equal_Steps(m))
+            if (t->next->m.Equal_Steps(monom))
             {
-                t->m.Change_Kof(m.a);
+                if (t->next->m.a + monom.a == 0)
+                {
+                    Link* p = t->next;
+                    t->next = p->next;
+                    delete p;
+                    return;
+                }
+                t->next->m.Change_Kof(t->next->m.a+monom.a);
+                end->next = start;
                 return;
             }
-            if (t->next->m.s > m.s)
+            if (t->next->m.s > monom.s)
             {
                 tmp->next = t->next;
                 t->next = tmp;
+                end->next = start;
                 return;
             }
             t = t->next;
         }
         t->next = tmp;
         end = tmp;
+        end->next = start;
     }
     Polinom& operator + (const Polinom& p2)
     {
@@ -148,9 +158,9 @@ public:
         Link* tmp2 = p2.start->next;
         while ((tmp1 != this->start) && (tmp2 != p2.start))
         {
-            if (tmp1->m.Equal_Steps(tmp2->m))
+            if (!tmp1->m.Equal_Steps(tmp2->m))
             {
-                p->Add_last(tmp1->m + tmp2->m);
+                p->Add(tmp1->m + tmp2->m);
                 tmp1 = tmp1->next;
                 tmp2 = tmp2->next;
             }
@@ -158,12 +168,12 @@ public:
             {
                 if (tmp1->m.s > tmp2->m.s)
                 {
-                    p->Add_last(tmp2->m);
+                    p->Add(tmp2->m);
                     tmp2 = tmp2->next;
                 }
                 else
                 {
-                    p->Add_last(tmp1->m);
+                    p->Add(tmp1->m);
                     tmp1 = tmp1->next;
                 }
             }
@@ -189,7 +199,7 @@ public:
         {
             if (tmp1->m.Equal_Steps(tmp2->m))
             {
-                p->Add_last(tmp1->m - tmp2->m);
+                p->Add(tmp1->m - tmp2->m);
                 tmp1 = tmp1->next;
                 tmp2 = tmp2->next;
             }
@@ -197,12 +207,12 @@ public:
             {
                 if (tmp1->m.s > tmp2->m.s)
                 {
-                    p->Add_last_Reverse(tmp2->m);
+                    p->Add_Reverse(tmp2->m);
                     tmp2 = tmp2->next;
                 }
                 else
                 {
-                    p->Add_last(tmp1->m);
+                    p->Add(tmp1->m);
                     tmp1 = tmp1->next;
                 }
             }
@@ -301,42 +311,6 @@ public:
         t = "";
         return in;
     }
-    //friend istream& operator>>(istream& in, Polinom& obj) {
-    //    obj.Clear();
-    //    string s;
-    //    getline(in, s);
-    //    string t = "";
-    //    int koef = 1;
-    //    for (int i = 0; i < s.size(); i++) 
-    //    {
-    //        char c = s[i];
-    //        if (c == ' ') {
-    //            if (t != "") {
-    //                Monom x(t);
-    //                x.a *= koef;
-    //                obj.Add(x);
-    //                koef = 1;
-    //            }
-    //            t = "";
-    //        }
-    //        else if (c == '+') {
-    //            koef = 1;
-    //        }
-    //        else if (c == '-' && i > 0 && s[i - 1] == '^')
-    //            t += c;
-    //        else if (c == '-') {
-    //            koef = -1;
-    //        }
-    //        else
-    //            t += c;
-    //    }
-    //    if (t != "") {
-    //        Monom x(t);
-    //        x.a *= koef;
-    //        obj.Add(x);
-    //    }
-    //    return in;
-    //}
     ~Polinom()
     {
         Clear();
